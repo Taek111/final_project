@@ -1,14 +1,19 @@
 import paho.mqtt.client as mqtt
 import time
 import struct
-
 def on_connect(client, userdata, rc):
     print("connected")
     client.subscribe("cds")
 
 def on_message(client, userdata, msg):
-    print("Topic:" + str(msg.topic.decode("utf-8")) + \
-            '\nMessage: '+ str(struct.unpack('h', msg.payload)[0]))
+    #print(str(msg.topic.decode("utf-8")))
+    print(str(msg.topic.decode("utf-8")))
+    id, con = struct.unpack('<Bh', msg.payload[0:3])
+    print(id)
+    print(con)
+
+    #print("Topic:" + str(msg.topic.decode("utf-8")) + \
+    #        '\nMessage: '+ str(struct.unpack('h', msg.payload)[0]))
 
 def main():
     print("Hi")
@@ -16,6 +21,7 @@ def main():
     print("connect")
     client.connect("192.168.43.146", 1883, 60)
     client.subscribe("cds")
+    client.subscribe("pir")
     client.on_connect = on_connect
     client.on_message = on_message
     print("client connected")
