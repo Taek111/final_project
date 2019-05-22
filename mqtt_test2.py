@@ -8,6 +8,7 @@ def on_connect(client, userdata, rc):
 
 def on_message(client, userdata, msg):
     print(str(msg.topic.decode("utf-8")))
+
     print("Topic:" + str(msg.topic.decode("utf-8")) + \
             '\nMessage: '+ str(struct.unpack('h', msg.payload)[0]))
 
