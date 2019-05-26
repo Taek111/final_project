@@ -15,8 +15,11 @@ def on_message(client, userdata, msg):
 	topic = str(msg.topic.decode("utf-8"))
 	if topic == "cds":
 		id,con = struct.unpack('<Bh', msg.payload[0:3])
-	if topic == "pir":
+	elif topic == "pir":
 		id,con = struct.unpack('<BB', msg.payload[0:2])
+	elif topic == "ir":
+		id = "outdoor"
+		con = struct.unpack('B', msg.payload)
 	
 	print(topic, id, con)
 	app.data_in(id, topic, con)
