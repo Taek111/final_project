@@ -20,7 +20,8 @@ class HomeCare():
         self.EmergencyCall = False
         self.isEmergency = False
         self.temperature = 0.0
-        self.indoor = True  
+        self.indoor = True
+        self.isOpen = False 
         self.active_log = time.time()
 
 
@@ -44,6 +45,10 @@ class HomeCare():
         elif topic == "temperature":
             self.temperature = value
             #todo:firebase
+        elif topic == "ir":
+			if value: # if ir value is HIGH
+				self.isOpen = True
+				self.check_indoor()
 
         elif topic == "ir":
             if not value: #check which value is right
@@ -77,9 +82,21 @@ class HomeCare():
                 return
         self.indoor = False
 
-
-
-
+    def check_indoor(self, interval = 60):
+		if not self.isOpen:
+			return
+		log_list = list()
+        for id in range(1,len(room_list)+1):
+            log_list.append(self.rooms[id].pir)
+		if time.time() - max(log_list) > 600:
+			self.indoor = False
+         else:
+			self.indoor = True
+		threading.Timer(interval, self.check_indoor()).start() 
+		
+			
+			
+>>>>>>> 701a51aea384bde20a1448e33bb30b132da059f6
     #ir sensor -> immediate state -> find indoor 
     def Emergency_state(self):
         pass
