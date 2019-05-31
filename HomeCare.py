@@ -1,6 +1,7 @@
 import time
-import queue
+import Queue as queue
 from firebase import firebase
+import threading
 
 room_list = ["room1", "room2", "room3"] #id 1,2
 
@@ -8,18 +9,18 @@ class HomeCare():
 
     def __init__(self,room_list):
 
-        #firebase 연결
+        #firebase 
         self.db = firebase.FirebaseApplication("https://test-4ac24.firebaseio.com/", None)
-        #room 객체 생성
+        #room 
         self.rooms = {}
         for id in range(1,len(room_list)+1):
             self.rooms[id] = Room(self, id)
 
-        #변수 설정
+        #setting variable 
         self.EmergencyCall = False
         self.isEmergency = False
         self.temperature = 0.0
-        self.indoor = True  #초기상태는 재실상태라고 가정
+        self.indoor = True  
         self.active_log = time.time()
 
 
@@ -35,22 +36,28 @@ class HomeCare():
             self.rooms[id].light = lightOn
 
         elif topic == "pir":
-            if value:
+            if not value:
                 self.rooms[id].pir = int(time.time())
                 self.updateDB(id, topic, self.rooms[id].pir)
                 self.active_log = self.rooms[id].pir
 
         elif topic == "temperature":
             self.temperature = value
-            #firebase에 업로드할 방식 생각해야함.
+            #todo:firebase
+
+        elif topic == "ir":
+            if not value: #check which value is right
+                check_10m = threading.Thread(target=self.check_indoor, arguments=(time.time()))
+                check_10m.start()
+
 
     def detectEmergentcy(self):
         self.cur_time = int(time.time())
-        if (self.cur_time - self.active_log) > 3600: #1시간 동안 활동 미감지시
+        if (self.cur_time - self.active_log) > 3600: #1 hour
             self.isEmergency = True
 
     def updateDB(self,id, topic, value):
-        #cds 바뀔때 lightlog = int(time.time())
+        #cds lightlog = int(time.time())
 
         if topic == "cds":
             self.db.patch('/user/test/'+ room_list[id-1], {'Light': value})
@@ -59,13 +66,24 @@ class HomeCare():
         if topic == "pir":
             self.db.patch('/user/test/'+ room_list[id-1], {'PIR': value})
 
-    def check_indoor(self):
-        pass
-    #ir 센서를 읽고 판단상태에 돌입한 뒤 일정 시간 후 최근 감지 시간 확인
+    def check_indoor(self, time_start):
+        while(time.time() - time_start < 600):
+            log_list = list()
+            for id in range(1, len(room_list) + 1):
+                log_list.append(self.rooms[id].pir)
+            log_list.append(self.active_log)
+            if max(log_list) > time_start:
+                self.indoor = True
+                return
+        self.indoor = False
+
+
+
+
+    #ir sensor -> immediate state -> find indoor 
     def Emergency_state(self):
         pass
-    #1단계 speaker on, 사용자 음성 확인 일정시간 후 2단계 어플리케이션 알람, 3단계 119 call
-
+    #stage 1 speaker on, 
 
     def print_all(self):
         for id in range(1, len(self.rooms)+1):
@@ -76,7 +94,7 @@ class Room():
         self.parent = parent
         self.id = id
         self.light = None
-        self.pir = None
+        self.pir = 0
     def print_state(self):
         print("room%d light:%s pir:%s"%(self.id, self.light, self.pir))
 
