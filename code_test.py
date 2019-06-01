@@ -1,5 +1,6 @@
 import time
 import threading
+import pygame
 
 def print_test():
     print("실행중")
@@ -11,14 +12,12 @@ def thread_test():
         cnt += 1
         print(cnt)
 
-
-
-
-def thread_test():
-    cnt = 0
-    while(True):
-        print(cnt)
-        cnt += 1
+def audio_test():
+    pygame.mixer.init()
+    bang = pygame.mixer.Sound("data/alarm_1.wav")
+    while True:
+        bang.play
+        time.sleep(2.0)
 
 
 # t = threading.Thread(target=thread_test)
@@ -26,3 +25,6 @@ def thread_test():
 # for i in range(50):
 #     print(time.time())
 #     time.sleep(1)
+
+if __name__ == '__main__':
+    audio_test()
