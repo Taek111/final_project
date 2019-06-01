@@ -28,7 +28,7 @@ def on_message(client, userdata, msg):
 
 	print(topic, id, con)
 	app.data_in(id, topic, con)
-	app.print_all()
+	
 	
     #print("topic:%s id:%d con:%d"%(topic, id, con))
     #print("Topic:" + str(msg.topic.decode("utf-8")) + \
