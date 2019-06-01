@@ -10,7 +10,7 @@ class HomeCare():
     def __init__(self,room_list):
 
         #firebase 
-        self.db = firebase.FirebaseApplication("https://test-4ac24.firebaseio.com/", None)
+        self.db = firebase.FirebaseApplication("https://pracs-be3b0.firebaseio.com/", None)
         #room 
         self.rooms = {}
         for id in range(1,len(room_list)+1):
@@ -27,7 +27,7 @@ class HomeCare():
 
     def data_in(self, id, topic, value):
         if topic == "cds":
-            if value < 100:
+            if value:
                 lightOn = True
             else:
                 lightOn = False
@@ -37,20 +37,19 @@ class HomeCare():
             self.rooms[id].light = lightOn
 
         elif topic == "pir":
-            if not value:
-                self.rooms[id].pir = int(time.time())
-                self.updateDB(id, topic, self.rooms[id].pir)
-                self.active_log = self.rooms[id].pir
+            self.rooms[id].pir = int(time.time())
+            self.updateDB(id, topic, self.rooms[id].pir)
+            self.active_log = self.rooms[id].pir
 
         elif topic == "temperature":
             self.temperature = value
             #todo:firebase
-        elif topic == "ir":
-			if value: # if ir value is HIGH
-				self.isOpen = True
-				self.check_indoor()
+
 
         elif topic == "ir":
+            if value:  # if ir value is HIGH
+                self.isOpen = True
+                self.check_indoor()
             if not value: #check which value is right
                 check_10m = threading.Thread(target=self.check_indoor, arguments=(time.time()))
                 check_10m.start()
@@ -82,21 +81,19 @@ class HomeCare():
                 return
         self.indoor = False
 
-    def check_indoor(self, interval = 60):
-		if not self.isOpen:
-			return
-		log_list = list()
-        for id in range(1,len(room_list)+1):
-            log_list.append(self.rooms[id].pir)
-		if time.time() - max(log_list) > 600:
-			self.indoor = False
-         else:
-			self.indoor = True
-		threading.Timer(interval, self.check_indoor()).start() 
-		
-			
-			
->>>>>>> 701a51aea384bde20a1448e33bb30b132da059f6
+    # def check_indoor(self, interval = 60):
+	# 	if not self.isOpen:
+	# 		return
+	# 	log_list = list()
+    #     for id in range(1,len(room_list)+1):
+    #         log_list.append(self.rooms[id].pir)
+	# 	if time.time() - max(log_list) > 600:
+	# 		self.indoor = False
+    #      else:
+	# 		self.indoor = True
+	# 	threading.Timer(interval, self.check_indoor()).start()
+
+
     #ir sensor -> immediate state -> find indoor 
     def Emergency_state(self):
         pass

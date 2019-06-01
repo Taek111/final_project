@@ -15,19 +15,17 @@ def on_message(client, userdata, msg):
 	
 	topic = str(msg.topic.decode("utf-8"))
 	if topic == "cds":
-		id,con = struct.unpack('<Bh', msg.payload[0:3])
+		id,con = struct.unpack('<BB', msg.payload[0:2])
 	elif topic == "pir":
 		id,con = struct.unpack('<BB', msg.payload[0:2])
-<<<<<<< HEAD
+
 	# if topic == "ir":
     #     id ="outdoor"
 
-=======
 	elif topic == "ir":
 		id = "outdoor"
 		con = struct.unpack('B', msg.payload)
-	
->>>>>>> 701a51aea384bde20a1448e33bb30b132da059f6
+
 	print(topic, id, con)
 	app.data_in(id, topic, con)
 	app.print_all()
