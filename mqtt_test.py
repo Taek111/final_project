@@ -3,7 +3,7 @@ import time
 import struct
 import HomeCare
 
-room_list = ["room1", "room2"] #id 1,2
+room_list = ["room1", "room2", "room3"] #id 1,2
 app = HomeCare.HomeCare(room_list)
 
 
@@ -36,7 +36,7 @@ def on_message(client, userdata, msg):
 
 def main():
     client = mqtt.Client()
-    client.connect("192.168.43.146", 1883, 60)
+    client.connect("192.168.0.8", 1883, 60)
     client.subscribe("cds")
     client.subscribe("pir")
     client.on_message = on_message		
