@@ -26,6 +26,3 @@ def thread_test():
 # for i in range(50):
 #     print(time.time())
 #     time.sleep(1)
-
-s = [1, 2,3 ,0]
-print(max(s))
