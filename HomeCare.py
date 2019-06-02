@@ -2,6 +2,10 @@ import time
 import Queue as queue
 from firebase import firebase
 import threading
+import matplotlib.pyplot as plt
+import numpy as np
+import firebase_admin
+from firebase_admin import credentials, storage
 
 room_list = ["room1", "room2", "room3"] #id 1,2
 
@@ -19,7 +23,7 @@ class HomeCare():
         #setting variable 
         self.EmergencyCall = False
         self.isEmergency = False
-        self.temperature = 0.0
+        self.temperature = queue.Queue(80)
         self.indoor = True
         self.isOpen = False 
         self.active_log = time.time()
@@ -42,15 +46,18 @@ class HomeCare():
             self.active_log = self.rooms[id].pir
 
         elif topic == "temperature":
-            self.temperature = value
-            #todo:firebase
+            qsize = self.temperature.qsize()
+            if qsize == 80:
+                self.temperature.get()
+            self.temperature.put(value)
+            if qsize > 2:
+                self.drawTemperatureGraph()
 
 
         elif topic == "ir":
             if value:  # if ir value is HIGH
                 self.isOpen = True
                 self.check_indoor()
-            if not value: #check which value is right
                 check_10m = threading.Thread(target=self.check_indoor, arguments=(time.time()))
                 check_10m.start()
 
@@ -81,23 +88,37 @@ class HomeCare():
                 return
         self.indoor = False
 
-    # def check_indoor(self, interval = 60):
-	# 	if not self.isOpen:
-	# 		return
-	# 	log_list = list()
-    #     for id in range(1,len(room_list)+1):
-    #         log_list.append(self.rooms[id].pir)
-	# 	if time.time() - max(log_list) > 600:
-	# 		self.indoor = False
-    #      else:
-	# 		self.indoor = True
-	# 	threading.Timer(interval, self.check_indoor()).start()
+    def drawTemperatureGraph(self):
+        cur_time = int(time.time())
+        qsize = self.temperature.qsize()
+        start, middle, end = time.localtime(cur_time - (qsize-1) * 600),\
+                             time.localtime(cur_time - (qsize-1) * 300),\
+                             time.localtime(cur_time)
+        tlist = np.linspace(cur_time-(qsize-1)*600, cur_time, qsize)
+        plt.plot(tlist, list(self.temperature.queue))
+        plt.xticks([cur_time-(qsize-1)*600, cur_time-(qsize-1)*300, cur_time],
+                   [str(start.tm_hour) + ':' + str(start.tm_min),
+                    str(middle.tm_hour) + ':' + str(middle.tm_min),
+                    str(end.tm_hour) + ':' + str(end.tm_min)])
+        plt.xlabel("Time")
+        plt.ylabel('Temperature ($^\circ$C)')
+        plt.title(str(end.tm_year) + ". " + str(end.tm_mon) + ". " + str(end.tm_mday))
+        plt.ylim(10,50)
+        plt.savefig("data/yellowdog.png", dpi=350)
+        cred = credentials.Certificate("pracs-be3b0-firebase-adminsdk-yqgu4-f92fb008fe.json")
+        firebase_admin.initialize_app(cred, {
+            'storageBucket': 'pracs-be3b0.appspot.com'})
+        bucket = storage.bucket()
+        zebraBlob = bucket.blob("yellowdog.png")
+        zebraBlob.upload_from_filename(filename="data/yellowdog.png")
 
 
     #ir sensor -> immediate state -> find indoor 
-    def Emergency_state(self):
+    def Emergency_one(self):
         pass
     #stage 1 speaker on, 
+
+
 
     def print_all(self):
         for id in range(1, len(self.rooms)+1):
