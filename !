@@ -25,6 +25,7 @@ class HomeCare():
 
         #setting variable
         self.username = username
+        self.EmergencyCall = False
         self.isEmergency = False
         self.temperature = queue.Queue(80)
         self.indoor = True
@@ -124,7 +125,6 @@ class HomeCare():
 
     #ir sensor -> immediate state -> find indoor 
     def Emergency_one(self):
-        print("Emergency_one")
         self.audio.load("data/alarm_1.wav")
         self.audio.play()
         while self.audio.get_busy():
