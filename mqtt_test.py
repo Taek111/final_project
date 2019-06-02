@@ -50,6 +50,8 @@ def main():
     client.connect("192.168.0.8", 1883, 60)
     client.subscribe("cds")
     client.subscribe("pir")
+    client.subscribe("help")
+    client.subscribe("ir")
     client.on_message = on_message		
     print("client connected")
     client.loop_forever()
