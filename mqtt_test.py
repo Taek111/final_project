@@ -13,14 +13,13 @@ def on_connect(client, userdata, rc):
     client.subscribe("connected")
 
 def on_message(client, userdata, msg):
-	
-	topic = str(msg.topic.decode("utf-8"))
-	if topic == "cds":
-	    id,con = struct.unpack('<BB', msg.payload[0:2])
-	elif topic == "pir":
-	    id,con = struct.unpack('<BB', msg.payload[0:2])
+    topic = str(msg.topic.decode("utf-8"))
+    if topic == "cds":
+        id,con = struct.unpack('<BB', msg.payload[0:2])
+    elif topic == "pir":
+        id,con = struct.unpack('<BB', msg.payload[0:2])
 
-	elif topic == "ir":
+    elif topic == "ir":
             id = "outdoor"
             con = struct.unpack('B', msg.payload)
 
@@ -36,9 +35,8 @@ def on_message(client, userdata, msg):
                     app.audio.stop()
                 app.isEmergency = False
 
-
-	print(topic, id, con)
-	app.data_in(id, topic, con)
+    print(topic, id, con)
+    app.data_in(id, topic, con)
 	
 	
     #print("topic:%s id:%d con:%d"%(topic, id, con))
