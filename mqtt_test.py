@@ -3,8 +3,9 @@ import time
 import struct
 import HomeCare
 
+username = "yellowdog"
 room_list = ["room1", "room2", "room3"] #id 1,2
-app = HomeCare.HomeCare(room_list)
+app = HomeCare.HomeCare(room_list, username)
 
 
 def on_connect(client, userdata, rc):
@@ -19,12 +20,22 @@ def on_message(client, userdata, msg):
 	elif topic == "pir":
 		id,con = struct.unpack('<BB', msg.payload[0:2])
 
-	# if topic == "ir":
-    #     id ="outdoor"
-
 	elif topic == "ir":
 		id = "outdoor"
 		con = struct.unpack('B', msg.payload)
+
+    elif topic == "help":
+        id = "helpcall"
+        con = struct.unpack('B', msg.payload)[0]
+        if con:#voice "help"
+            if app.audio.get_busy():
+                app.audio.stop()
+            app.EmergencyCall()
+        else: # voice "ok"
+            if app.audio.get_busy():
+                app.audio.stop()
+            app.isEmergency = False
+
 
 	print(topic, id, con)
 	app.data_in(id, topic, con)

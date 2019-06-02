@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import firebase_admin
 from firebase_admin import credentials, storage
+import pygame
 
 room_list = ["room1", "room2", "room3"] #id 1,2
 
 class HomeCare():
 
-    def __init__(self,room_list):
+    def __init__(self,room_list, username):
 
         #firebase 
         self.db = firebase.FirebaseApplication("https://pracs-be3b0.firebaseio.com/", None)
@@ -20,13 +21,20 @@ class HomeCare():
         for id in range(1,len(room_list)+1):
             self.rooms[id] = Room(self, id)
 
-        #setting variable 
+        #setting variable
+        self.username = username
         self.EmergencyCall = False
         self.isEmergency = False
         self.temperature = queue.Queue(80)
         self.indoor = True
         self.isOpen = False 
-        self.active_log = time.time()
+        self.active_log = int(time.time())
+        pygame.init()
+        pygame.mixer.init()
+        self.audio = pygame.mixer.music
+        self.detectEmergentcy()
+
+
 
 
     def data_in(self, id, topic, value):
@@ -37,6 +45,7 @@ class HomeCare():
                 lightOn = False
             if not self.rooms[id].light == lightOn:
                 self.updateDB(id, topic, lightOn)
+
                 self.active_log = time.time()
             self.rooms[id].light = lightOn
 
@@ -63,29 +72,28 @@ class HomeCare():
 
 
     def detectEmergentcy(self):
-        self.cur_time = int(time.time())
-        if (self.cur_time - self.active_log) > 3600: #1 hour
+        print("detect Emergency")
+        if (int(time.time()) - self.active_log) > 3600: #1 hour
             self.isEmergency = True
+            self.Emergency_one()
+        threading.Timer(600, self.detectEmergentcy()).start()
 
     def updateDB(self,id, topic, value):
         #cds lightlog = int(time.time())
 
         if topic == "cds":
-            self.db.patch('/user/test/'+ room_list[id-1], {'Light': value})
-            self.db.patch('/user/test', {'Lightlog': int(time.time())})
+            self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'Light': value})
+            self.db.patch('/user/'+self.username+, {'Lightlog': int(time.time())})
 
         if topic == "pir":
-            self.db.patch('/user/test/'+ room_list[id-1], {'PIR': value})
-
+            self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'PIR': value})
+            self.db.patch('/user/'+self.username, {'Lightlog_room': "room"+str(id)})
     def check_indoor(self, time_start):
         while(time.time() - time_start < 600):
-            log_list = list()
-            for id in range(1, len(room_list) + 1):
-                log_list.append(self.rooms[id].pir)
-            log_list.append(self.active_log)
-            if max(log_list) > time_start:
+            if self.active_log > time_start:
                 self.indoor = True
                 return
+            time.sleep(30)
         self.indoor = False
 
     def drawTemperatureGraph(self):
@@ -115,9 +123,28 @@ class HomeCare():
 
     #ir sensor -> immediate state -> find indoor 
     def Emergency_one(self):
-        pass
-    #stage 1 speaker on, 
+        self.audio.load("data/alarm_1.wav")
+        self.audio.play()
+        while self.audio.get_busy():
+            time.sleep(5)
+        time.sleep(30)
+        if self.isEmergency == True:
+            self.Emergency_two()
 
+    def Emergency_two(self):
+        self.audio.load("data/alarm_2.wav")
+        self.audio.play()
+        while self.audio.get_busy():
+            time.sleep(5)
+        time.sleep(30)
+        if self.isEmergency == True:
+            self.EmergencyCall()
+            self.audio.load("data/alarm_3.wav")
+            self.audio.play()
+
+    #stage 1 speaker on, 
+    def EmergencyCall(self):
+        print("Emergency Call")
 
 
     def print_all(self):
