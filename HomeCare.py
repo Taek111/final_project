@@ -2,6 +2,8 @@ import time
 import Queue as queue
 from firebase import firebase
 import threading
+import matplotlib
+matplotlib.use("Pdf")
 import matplotlib.pyplot as plt
 import numpy as np
 import firebase_admin
@@ -83,7 +85,7 @@ class HomeCare():
 
         if topic == "cds":
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'Light': value})
-            self.db.patch('/user/'+self.username+, {'Lightlog': int(time.time())})
+            self.db.patch('/user/'+self.username, {'Lightlog': int(time.time())})
 
         if topic == "pir":
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'PIR': value})

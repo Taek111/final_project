@@ -16,25 +16,25 @@ def on_message(client, userdata, msg):
 	
 	topic = str(msg.topic.decode("utf-8"))
 	if topic == "cds":
-		id,con = struct.unpack('<BB', msg.payload[0:2])
+	    id,con = struct.unpack('<BB', msg.payload[0:2])
 	elif topic == "pir":
-		id,con = struct.unpack('<BB', msg.payload[0:2])
+	    id,con = struct.unpack('<BB', msg.payload[0:2])
 
 	elif topic == "ir":
-		id = "outdoor"
-		con = struct.unpack('B', msg.payload)
+            id = "outdoor"
+            con = struct.unpack('B', msg.payload)
 
-    elif topic == "help":
-        id = "helpcall"
-        con = struct.unpack('B', msg.payload)[0]
-        if con:#voice "help"
-            if app.audio.get_busy():
-                app.audio.stop()
-            app.EmergencyCall()
-        else: # voice "ok"
-            if app.audio.get_busy():
-                app.audio.stop()
-            app.isEmergency = False
+        elif topic == "help":
+            id = "helpcall"
+            con = struct.unpack('B', msg.payload)[0]
+            if con:#voice "help"
+                if app.audio.get_busy():
+                    app.audio.stop()
+                app.EmergencyCall()
+            else: # voice "ok"
+                if app.audio.get_busy():
+                    app.audio.stop()
+                app.isEmergency = False
 
 
 	print(topic, id, con)
