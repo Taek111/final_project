@@ -22,9 +22,8 @@ def on_message(client, userdata, msg):
         id,con = struct.unpack('<BB', msg.payload[0:2])
 
     elif topic == "isOpen":
-        print(topi)
-        id = "outdoor"
-        con = struct.unpack('h', msg.payload[0:1])[0]
+        id = "isOpen"
+        con = struct.unpack('b', msg.payload[0:2])[0]
     elif topic == "help":
         id = "helpcall"
         con = struct.unpack('B', msg.payload)[0]
@@ -49,6 +48,7 @@ def on_message(client, userdata, msg):
 
     print(topic, id, con)
     app.data_in(id, topic, con)
+    
 	
 	
     #print("topic:%s id:%d con:%d"%(topic, id, con))

@@ -28,7 +28,6 @@ class HomeCare():
         self.isEmergency = False
         self.temperature = queue.Queue(80)
         self.indoor = True
-        self.isOpen = False 
         self.active_log = int(time.time())
         pygame.init()
         pygame.mixer.init()
@@ -39,6 +38,8 @@ class HomeCare():
 
 
     def data_in(self, id, topic, value):
+        
+    
         if topic == "cds":
             if value:
                 lightOn = True
@@ -64,12 +65,16 @@ class HomeCare():
                 self.drawTemperatureGraph()
 
 
-        elif topic == "ir":
+        elif topic == "isOpen":
+            print(topic, id, value)
             if value:  # if ir value is HIGH
-                self.isOpen = True
-                self.check_indoor()
-                check_10m = threading.Thread(target=self.check_indoor, arguments=(time.time()))
+                
+                cur_time = int(time.time())
+                print(cur_time)
+                check_10m = threading.Thread(target=self.check_indoor, args=(cur_time,))
+                
                 check_10m.start()
+                
 
 
     def detectEmergentcy(self):
@@ -91,6 +96,7 @@ class HomeCare():
             self.db.patch('/user/'+self.username, {'Lightlog_room': "room"+str(id)})
     def check_indoor(self, time_start):
         while(time.time() - time_start < 600):
+            
             if self.active_log > time_start:
                 self.indoor = True
                 return
