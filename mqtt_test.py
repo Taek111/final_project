@@ -3,9 +3,8 @@ import time
 import struct
 import HomeCare
 import threading
-username = "yellowdog"
-room_list = ["room1", "room2", "room3"] #id 1,2
-app = HomeCare.HomeCare(room_list, username)
+import config
+
 
 
 def on_connect(client, userdata, rc):
@@ -54,8 +53,7 @@ def on_message(client, userdata, msg):
     #print("topic:%s id:%d con:%d"%(topic, id, con))
     #print("Topic:" + str(msg.topic.decode("utf-8")) + \
     #        '\nMessage: '+ str(struct.unpack('h', msg.payload)[0]))
-
-def main():
+def client_setup():
     client = mqtt.Client()
     client.connect("192.168.0.8", 1883, 60)
     client.subscribe("cds")
@@ -64,9 +62,16 @@ def main():
     client.subscribe("isOpen")
     client.subscribe("temperature")
     client.subscribe("realcds")
-    client.on_message = on_message		
+    client.on_message = on_message
     print("client connected")
     client.loop_forever()
 
+
 if __name__ == "__main__":
-    main()
+
+    username = config.username
+    room_list = config.username
+    appUser_num = config.appUser_num
+    app = HomeCare.HomeCare(room_list, username, appUser_num)
+
+    client_setup()

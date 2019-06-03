@@ -9,12 +9,13 @@ import numpy as np
 import firebase_admin
 from firebase_admin import credentials, storage
 import pygame
+import send
 
-room_list = ["room1", "room2", "room3"] #id 1,2
+
 
 class HomeCare():
 
-    def __init__(self,room_list, username):
+    def __init__(self,room_list, username,appUser):
 
         #firebase 
         self.db = firebase.FirebaseApplication("https://pracs-be3b0.firebaseio.com/", None)
@@ -25,6 +26,7 @@ class HomeCare():
 
         #setting variable
         self.username = username
+        self.appUser = appUser
         self.isEmergency = False
         self.temperature = queue.Queue(80)
         self.indoor = True
@@ -33,6 +35,7 @@ class HomeCare():
         pygame.mixer.init()
         self.audio = pygame.mixer.music
         self.detectEmergentcy()
+        self.callEmergency = False
 
 
 
@@ -42,14 +45,14 @@ class HomeCare():
     
         if topic == "cds":
             if value:
-                lightOn = True
+                light_status = True
             else:
-                lightOn = False
-            if not self.rooms[id].light == lightOn:
-                self.updateDB(id, topic, lightOn)
+                light_status = False
+            if not self.rooms[id].light == light_status:
+                self.updateDB(id, topic, light_status)
 
                 self.active_log = time.time()
-            self.rooms[id].light = lightOn
+            self.rooms[id].light = light_status
 
         elif topic == "pir":
             self.rooms[id].pir = int(time.time())
@@ -72,17 +75,17 @@ class HomeCare():
                 cur_time = int(time.time())
                 print(cur_time)
                 check_10m = threading.Thread(target=self.check_indoor, args=(cur_time,))
-                
                 check_10m.start()
                 
 
 
     def detectEmergentcy(self):
         print("detect Emergency")
-        if (int(time.time()) - self.active_log) > 3600: #1 hour
-            self.isEmergency = True
-            self.Emergency_one()
-        threading.Timer(600, self.detectEmergentcy).start()
+        while self.indoor:
+            if (int(time.time()) - self.active_log) > 3600: #1 hour
+                self.isEmergency = True
+                self.Emergency_one()
+            threading.Timer(600, self.detectEmergentcy).start()
 
     def updateDB(self,id, topic, value):
         #cds lightlog = int(time.time())
@@ -90,10 +93,10 @@ class HomeCare():
         if topic == "cds":
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'Light': value})
             self.db.patch('/user/'+self.username, {'Lightlog': int(time.time())})
+            self.db.patch('/user/' + self.username, {'Lightlog_room': "room" + str(id)})
 
         if topic == "pir":
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'PIR': value})
-            self.db.patch('/user/'+self.username, {'Lightlog_room': "room"+str(id)})
     def check_indoor(self, time_start):
         while(time.time() - time_start < 600):
             
@@ -140,19 +143,21 @@ class HomeCare():
             self.Emergency_two()
 
     def Emergency_two(self):
+        send.send_to_appUser(self.appUser, 1)
         self.audio.load("data/alarm_2.wav")
         self.audio.play()
         while self.audio.get_busy():
             time.sleep(5)
         time.sleep(30)
         if self.isEmergency == True:
-            self.EmergencyCall()
+            send.send_to_119(1)
             self.audio.load("data/alarm_3.wav")
             self.audio.play()
 
     #stage 1 speaker on, 
     def EmergencyCall(self):
         print("Emergency Call")
+        send.send_to_119(2)
 
 
     def print_all(self):
@@ -170,7 +175,7 @@ class Room():
 
 
 if __name__ == '__main__':
-
+    room_list = ["room1", "room2", "room3"] #id 1,2,3
     app = HomeCare(room_list)
     n = time.time()
     app.data_in(2,"cds",0)
