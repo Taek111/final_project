@@ -67,6 +67,17 @@ class SafeCare():
             if qsize > 2:
                 self.drawTemperatureGraph()
 
+        elif topic == "help":
+            if not value:  # voice "help"
+                while not self.isEmergency:
+                    self.isEmergency = True
+                    Eapp = threading.Thread(target=self.Emergency_one)
+                    Eapp.start()
+            else:  # voice "ok"
+                if self.audio.get_busy():
+                    self.audio.stop()
+                self.isEmergency = False
+
 
         elif topic == "isOpen":
             print(topic, id, value)

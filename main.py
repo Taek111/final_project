@@ -25,21 +25,10 @@ def on_message(client, userdata, msg):
     elif topic == "help":
         id = "helpcall"
         con = struct.unpack('B', msg.payload)[0]
-        if not con:#voice "help"
-            while not app.isEmergency:
-                app.isEmergency = True
-                Eapp = threading.Thread(target=app.Emergency_one)
-                Eapp.start()
-        else: # voice "ok"
-            if app.audio.get_busy():
-                app.audio.stop()
-            app.isEmergency = False
+
     elif topic == "temperature":
         id = "temp_mini"
         con = struct.unpack('B',msg.payload)[0]
-   # elif topic == "realcds":
-    #    id = "value"
-     #   con=struct.unpack('<Bh',msg.payload[0:3])
 
 
 

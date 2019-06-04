@@ -84,7 +84,7 @@ void setup() {
 void loop() {
   Serial.print("Client State : ");
   Serial.println(client.state());
-  delay(5000);
+  delay(10000);
   
   if (!client.connected()) {
     reconnect();
