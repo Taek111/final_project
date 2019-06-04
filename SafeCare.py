@@ -136,13 +136,13 @@ class SafeCare():
         plt.ylabel('Temperature ($^\circ$C)')
         plt.title(str(end.tm_year) + ". " + str(end.tm_mon) + ". " + str(end.tm_mday))
         plt.ylim(20,40)
-        plt.savefig("data/yellowdog.png", dpi=350)
+        plt.savefig("data/"+self.username+".png", dpi=350)
         cred = credentials.Certificate("pracs-be3b0-firebase-adminsdk-yqgu4-f92fb008fe.json")
         firebase_admin.initialize_app(cred, {
             'storageBucket': 'pracs-be3b0.appspot.com'})
         bucket = storage.bucket()
-        zebraBlob = bucket.blob("yellowdog.png")
-        zebraBlob.upload_from_filename(filename="data/yellowdog.png")
+        tempBlob = bucket.blob(self.username+".png")
+        tempBlob.upload_from_filename(filename="data/"+self.username+".png")
 
 
     #ir sensor -> immediate state -> find indoor 
