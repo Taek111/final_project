@@ -1,10 +1,9 @@
 import paho.mqtt.client as mqtt
 import time
 import struct
-import HomeCare
+import SafeCare
 import threading
 import config
-
 
 
 def on_connect(client, userdata, rc):
@@ -71,6 +70,6 @@ if __name__ == "__main__":
     username = config.username
     room_list = config.username
     appUser_num = config.appUser_num
-    app = HomeCare.HomeCare(room_list, username, appUser_num)
+    app = SafeCare.SafeCare(room_list, username, appUser_num)
 
     client_setup()
