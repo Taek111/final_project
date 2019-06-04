@@ -96,7 +96,7 @@ class SafeCare():
     def detectEmergentcy(self):
         print("detect Emergency")
         while self.indoor:
-            if (int(time.time()) - self.active_log) > 3600 * 6 and not self.onBed: #1 hour
+            if (int(time.time()) - self.active_log) > 3600 * 6 and not self.onBed: #6 hour
                 self.isEmergency = True
                 self.Emergency_one()
             threading.Timer(3600 * 6, self.detectEmergentcy).start()
