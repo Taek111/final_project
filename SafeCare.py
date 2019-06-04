@@ -93,10 +93,10 @@ class SafeCare():
     def detectEmergentcy(self):
         print("detect Emergency")
         while self.indoor:
-            if (int(time.time()) - self.active_log) > 3600: #1 hour
+            if (int(time.time()) - self.active_log) > 3600 * 6: #1 hour
                 self.isEmergency = True
                 self.Emergency_one()
-            threading.Timer(600, self.detectEmergentcy).start()
+            threading.Timer(3600 * 6, self.detectEmergentcy).start()
 
     def updateDB(self,id, topic, value):
         #cds lightlog = int(time.time())
@@ -149,7 +149,7 @@ class SafeCare():
         self.audio.play()
         while self.audio.get_busy():
             time.sleep(5)
-        time.sleep(30)
+        time.sleep(10 * 60)
         if self.isEmergency == True:
             self.Emergency_two()
 
@@ -159,7 +159,7 @@ class SafeCare():
         self.audio.play()
         while self.audio.get_busy():
             time.sleep(5)
-        time.sleep(30)
+        time.sleep(30 * 60)
         if self.isEmergency == True:
             send.send_to_119(1)
             self.audio.load("data/alarm_3.wav")
