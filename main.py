@@ -48,7 +48,6 @@ def client_setup():
     client.subscribe("help")
     client.subscribe("isOpen")
     client.subscribe("temperature")
-    client.subscribe("realcds")
     client.on_message = on_message
     print("client connected")
     client.loop_forever()
