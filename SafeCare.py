@@ -36,6 +36,7 @@ class SafeCare():
         self.audio = pygame.mixer.music
         self.detectEmergentcy()
         self.callEmergency = False
+        self.onBed = False
 
 
 
@@ -60,6 +61,8 @@ class SafeCare():
             self.active_log = self.rooms[id].pir
 
         elif topic == "temperature":
+            if value > 30:
+                self.onBed = True
             qsize = self.temperature.qsize()
             if qsize == 80:
                 self.temperature.get()
@@ -93,7 +96,7 @@ class SafeCare():
     def detectEmergentcy(self):
         print("detect Emergency")
         while self.indoor:
-            if (int(time.time()) - self.active_log) > 3600 * 6: #1 hour
+            if (int(time.time()) - self.active_log) > 3600 * 6 and not self.onBed: #1 hour
                 self.isEmergency = True
                 self.Emergency_one()
             threading.Timer(3600 * 6, self.detectEmergentcy).start()
