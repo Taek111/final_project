@@ -5,6 +5,10 @@ import SafeCare
 import threading
 import config
 
+username = config.username
+room_list = config.username
+appUser_num = config.appUser_num
+app = SafeCare.SafeCare(room_list, username, appUser_num)
 
 def on_connect(client, userdata, rc):
     print("connected")
@@ -54,10 +58,4 @@ def client_setup():
 
 
 if __name__ == "__main__":
-
-    username = config.username
-    room_list = config.username
-    appUser_num = config.appUser_num
-    app = SafeCare.SafeCare(room_list, username, appUser_num)
-
     client_setup()
