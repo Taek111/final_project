@@ -79,7 +79,9 @@ class SafeCare():
             else:  # voice "ok"
                 if self.audio.get_busy():
                     self.audio.stop()
-                self.isEmergency = False
+                if self.isEmergency:
+                    Ecancel = threading.Thread(target=self.Emergency_cancel)
+                    Ecancel.start()
 
 
         elif topic == "isOpen":
@@ -167,6 +169,13 @@ class SafeCare():
             send.send_to_119(1)
             self.audio.load("data/alarm_3.wav")
             self.audio.play()
+
+    def Emergency_cancel(self):
+        self.isEmergency = False
+        self.audio.load("data/alarm_cancel.wav")
+        self.audio.play()
+        while self.audio.get_busy():
+            time.sleep(5)
 
     #stage 1 speaker on, 
     def EmergencyCall(self):
