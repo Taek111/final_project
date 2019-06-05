@@ -26,6 +26,7 @@ class SafeCare():
 
         #setting variable
         self.username = username
+        print(self.username)
         self.appUser = appUser
         self.isEmergency = False
         self.temperature = queue.Queue(80)
@@ -97,11 +98,11 @@ class SafeCare():
 
     def detectEmergentcy(self):
         print("detect Emergency")
-        while self.indoor:
+        if self.indoor:
             if (int(time.time()) - self.active_log) > 3600 * 6 and not self.onBed: #6 hour
                 self.isEmergency = True
                 self.Emergency_one()
-            threading.Timer(3600 * 6, self.detectEmergentcy).start()
+        threading.Timer(3600 * 6, self.detectEmergentcy).start()
 
     def updateDB(self,id, topic, value):
         #cds lightlog = int(time.time())
@@ -112,10 +113,12 @@ class SafeCare():
             self.db.patch('/user/' + self.username, {'Lightlog_room': "room" + str(id)})
 
         if topic == "pir":
+            print('/user/'+self.username+'/'+room_list[id-1],value)
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'PIR': value})
+            print("update")
 
         if topic == "isEmergency":
-            self.db.patch('/user/' + self.username, {'isEmergency': value})
+            self.db.patch('/user/' + self.username, {'Emergency': value})
     def check_indoor(self, time_start):
         while(time.time() - time_start < 600):
             
@@ -177,7 +180,7 @@ class SafeCare():
     def Emergency_cancel(self):
         self.isEmergency = False
         self.data_in("help", "isEmergency", False)
-        self.audio.load("data/alarm_cancel.wav")
+        self.audio.load("data/alarm_cancle.wav")
         self.audio.play()
         while self.audio.get_busy():
             time.sleep(5)
