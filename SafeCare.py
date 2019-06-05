@@ -113,6 +113,9 @@ class SafeCare():
 
         if topic == "pir":
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'PIR': value})
+
+        if topic == "isEmergency":
+            self.db.patch('/user/' + self.username, {'isEmergency': value})
     def check_indoor(self, time_start):
         while(time.time() - time_start < 600):
             
@@ -159,6 +162,7 @@ class SafeCare():
             self.Emergency_two()
 
     def Emergency_two(self):
+        self.data_in("help", "isEmergency", True)
         send.send_to_appUser(self.appUser, 1)
         self.audio.load("data/alarm_2.wav")
         self.audio.play()
@@ -172,6 +176,7 @@ class SafeCare():
 
     def Emergency_cancel(self):
         self.isEmergency = False
+        self.data_in("help", "isEmergency", False)
         self.audio.load("data/alarm_cancel.wav")
         self.audio.play()
         while self.audio.get_busy():
