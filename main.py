@@ -6,7 +6,7 @@ import threading
 import config
 
 username = config.username
-room_list = config.username
+room_list = config.room_list
 appUser_num = config.appUser_num
 app = SafeCare.SafeCare(room_list, username, appUser_num)
 
