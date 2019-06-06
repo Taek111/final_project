@@ -12,7 +12,7 @@ import pygame
 import send
 
 
-
+room_list = ["room1", "room2", "room3"]
 class SafeCare():
 
     def __init__(self,room_list, username,appUser):
@@ -110,12 +110,11 @@ class SafeCare():
         if topic == "cds":
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'Light': value})
             self.db.patch('/user/'+self.username, {'Lightlog': int(time.time())})
-            self.db.patch('/user/' + self.username, {'Lightlog_room': "room" + str(id)})
+            self.db.patch('/user/' + self.username, {'Lightlog_room': id})
 
         if topic == "pir":
-            print('/user/'+self.username+'/'+room_list[id-1],value)
             self.db.patch('/user/'+self.username+'/'+ room_list[id-1], {'PIR': value})
-            print("update")
+            self.db.patch('/user/'+self.username, {'PIRlog_room': id})
 
         if topic == "isEmergency":
             self.db.patch('/user/' + self.username, {'Emergency': value})

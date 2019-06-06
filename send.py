@@ -57,7 +57,7 @@ def send_to_appUser(recv_num,type):
         print("Error Code : %s" % e.code)
         print("Error Message : %s" % e.msg)
 
-    sys.exit()
+    
 
 def send_to_119(type):
     # set api key, api secret
@@ -104,4 +104,4 @@ def send_to_119(type):
         print("Error Code : %s" % e.code)
         print("Error Message : %s" % e.msg)
 
-    sys.exit()
+
