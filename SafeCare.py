@@ -15,7 +15,7 @@ import send
 room_list = ["room1", "room2", "room3"]
 class SafeCare():
 
-    def __init__(self,room_list, username,appUser):
+    def __init__(self, parent, room_list, username,appUser):
 
         #firebase 
         self.db = firebase.FirebaseApplication("https://pracs-be3b0.firebaseio.com/", None)
@@ -25,8 +25,8 @@ class SafeCare():
             self.rooms[id] = Room(self, id)
 
         #setting variable
+        self.parent = parent
         self.username = username
-        print(self.username)
         self.appUser = appUser
         self.isEmergency = False
         self.temperature = queue.Queue(80)
@@ -35,7 +35,7 @@ class SafeCare():
         pygame.init()
         pygame.mixer.init()
         self.audio = pygame.mixer.music
-        self.detectEmergentcy()
+        self.detectEmergency()
         self.callEmergency = False
         self.onBed = False
 
@@ -43,8 +43,6 @@ class SafeCare():
 
 
     def data_in(self, id, topic, value):
-        
-    
         if topic == "cds":
             if value:
                 light_status = True
@@ -75,7 +73,7 @@ class SafeCare():
             if not value:  # voice "help"
                 while not self.isEmergency:
                     self.isEmergency = True
-                    Eapp = threading.Thread(target=self.Emergency_one)
+                    Eapp = threading.Thread(target=self.EmergencyCall())
                     Eapp.start()
             else:  # voice "ok"
                 if self.audio.get_busy():
@@ -183,11 +181,18 @@ class SafeCare():
         self.audio.play()
         while self.audio.get_busy():
             time.sleep(5)
+        self.parent.client.publish("Buzz", '0')
 
     #stage 1 speaker on, 
     def EmergencyCall(self):
-        print("Emergency Call")
+        print("EmergencyCall")
         send.send_to_119(2)
+        self.audio.load("data/alarm_3.wav")
+        self.audio.play()
+        while self.audio.get_busy():
+            time.sleep(5)
+        self.parent.client.publish("Buzz", '1')
+
 
 
     def print_all(self):

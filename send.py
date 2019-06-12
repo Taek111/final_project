@@ -19,7 +19,7 @@ def send_to_appUser(recv_num,type):
 
     ## 4 params(to, from, type, text) are mandatory. must be filled
     params = dict()
-    params['type'] = 'sms' # Message type ( sms, lms, mms, ata )
+    params['type'] = 'lms' # Message type ( sms, lms, mms, ata )
     params['to'] = recv_num # Recipients Number '01000000000,01000000001'
     params['from'] = '01082156604' # Sender number
     if type == 1:
@@ -66,7 +66,7 @@ def send_to_119(type):
 
     ## 4 params(to, from, type, text) are mandatory. must be filled
     params = dict()
-    params['type'] = 'sms' # Message type ( sms, lms, mms, ata )
+    params['type'] = 'lms' # Message type ( sms, lms, mms, ata )
     params['to'] = "01049144651" # Recipients Number '01000000000,01000000001'
     params['from'] = '01082156604' # Sender number
     if type == 1:
