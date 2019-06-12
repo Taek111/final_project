@@ -27,7 +27,6 @@ class SafeCare():
         #setting variable
         self.parent = parent
         self.username = username
-        print(self.username)
         self.appUser = appUser
         self.isEmergency = False
         self.temperature = queue.Queue(80)

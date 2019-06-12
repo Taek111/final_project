@@ -9,7 +9,7 @@ import config
 class main():
     def __init__(self):
         self.client = mqtt.Client()
-        self.client.connect("192.168.0.8", 1883, 60)
+        self.client.connect("172.20.10.7", 1883, 60)
         self.client.subscribe("cds")
         self.client.subscribe("pir")
         self.client.subscribe("help")
@@ -17,7 +17,7 @@ class main():
         self.client.subscribe("temperature")
         self.client.on_message = self.on_message
         print("Client connected")
-        self.SafeCare = SafeCare(self, config.room_list, config.username, config.appUser_num)
+        self.SafeCare = SafeCare.SafeCare(self, config.room_list, config.username, config.appUser_num)
         self.client.loop_forever()
 
     def on_connect(self, client, userdata, rc):
@@ -44,4 +44,6 @@ class main():
         print(topic, id, con)
         self.SafeCare.data_in(id, topic, con)
 
+if __name__ == '__main__':
+    app = main()
 
