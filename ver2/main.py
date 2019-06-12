@@ -5,20 +5,22 @@ import SafeCare
 import threading
 import config
 
+cname = "Client_"
+topics = ["cds", "pir", "help", "isOpen", "temperature"]
 
 class main():
     def __init__(self):
-        self.client = mqtt.Client()
-        self.client.connect("172.20.10.7", 1883, 60)
-        self.client.subscribe("cds")
-        self.client.subscribe("pir")
-        self.client.subscribe("help")
-        self.client.subscribe("isOpen")
-        self.client.subscribe("temperature")
-        self.client.on_message = self.on_message
-        print("Client connected")
         self.SafeCare = SafeCare.SafeCare(self, config.room_list, config.username, config.appUser_num)
-        self.client.loop_forever()
+        self.clients = list()
+        for topic in topics:
+            self.client = mqtt.Client(cname+topic)
+            self.client.connect("192.168.0.8", 1883, 60)
+            self.client.subscribe(topic)
+            self.client.on_message = self.on_message
+            self.clients.append(self.client)
+            self.client.loop_start()
+
+        print("Clients connected")
 
     def on_connect(self, client, userdata, rc):
         print("Connected")
