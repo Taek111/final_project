@@ -21,7 +21,8 @@ class main():
             self.client.loop_start()
 
         print("Clients connected")
-
+        self.inputfuc = threading.Thread(target= self.input_check)
+        self.inputfuc.start()
     def on_connect(self, client, userdata, rc):
         print("Connected")
         client.subscribe("connected")
@@ -46,6 +47,21 @@ class main():
         print(topic, id, con)
         self.SafeCare.data_in(id, topic, con)
 
+    def input_check(self):
+        raw = input()
+        if raw == "1": #상황1: 단계별알림시스템 1단계, 보여주고 사용자의 응답"괜찮아"까지 보여준다.
+            e_one = threading.Thread(target=self.SafeCare.Emergency_one)
+            e_one.start()
+            self.SafeCare.isEmergency = True
+        elif raw == "2": #상황2: 단계별알림시스템 2단계, 보여주고 문자, 휴대폰의 알림까지
+            e_two = threading.Thread(target=self.SafeCare.Emergency_two)
+            e_two.start()
+        elif raw == "3": #상황3: 단계별알림시스템 3단계, 보여주고 ppt화면으로 119에 가는 문자
+            self.SafeCare.audio.load("data/alarm_3.wav")
+            self.SafeCare.audio.play()
+
+        self.input_check()
 if __name__ == '__main__':
     app = main()
+
 

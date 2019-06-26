@@ -162,12 +162,13 @@ class SafeCare():
             self.Emergency_two()
 
     def Emergency_two(self):
-        self.data_in("help", "isEmergency", True)
-        send.send_to_appUser(self.appUser, 1)
+        self.updateDB("help", "isEmergency", True)
+
         self.audio.load("data/alarm_2.wav")
         self.audio.play()
         while self.audio.get_busy():
             time.sleep(5)
+        send.send_to_appUser(self.appUser, 1)
         time.sleep(30 * 60)
         if self.isEmergency == True:
             send.send_to_119(1)
